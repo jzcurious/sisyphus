@@ -10,6 +10,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(indicators)
 
+FetchContent_Declare(
+  deltat
+  GIT_REPOSITORY https://github.com/jzcurious/deltat.git
+  GIT_TAG v1.0.0
+)
+FetchContent_MakeAvailable(deltat)
+
 file(GLOB_RECURSE SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 )
@@ -23,4 +30,5 @@ target_include_directories(sisyphus PRIVATE
 
 target_link_libraries(sisyphus PRIVATE
     indicators
+    deltat
 )
