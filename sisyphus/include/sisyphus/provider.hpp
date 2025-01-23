@@ -14,8 +14,8 @@ concept not_void = not std::same_as<T, void>;
 namespace sis {
 
 template <class T>
-concept DataProviderKind = requires(T x, std::size_t i) {
-  { x.data(i) } -> detail::not_void;
+concept DataProviderKind = requires(T x, std::size_t n) {
+  { x.data(n) } -> detail::not_void;
 };
 
 }  // namespace sis
