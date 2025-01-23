@@ -4,11 +4,18 @@
 #include <concepts>
 #include <cstddef>
 
+namespace sis::detail {
+
+template <class T>
+concept not_void = not std::same_as<T, void>;
+
+}
+
 namespace sis {
 
-template <class T, class U>
+template <class T>
 concept DataProviderKind = requires(T x, std::size_t i) {
-  { x.data(i) } -> std::same_as<U>;
+  { x.data(i) } -> detail::not_void;
 };
 
 }  // namespace sis
