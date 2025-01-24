@@ -15,7 +15,7 @@ namespace sis {
 
 template <class T>
 concept DataProviderKind = requires(T x, std::size_t n) {
-  { x.data(n) } -> detail::not_void;
+  { x(n) } -> detail::not_void;
 };
 
 }  // namespace sis

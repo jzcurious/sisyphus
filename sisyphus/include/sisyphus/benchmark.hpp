@@ -45,16 +45,21 @@ class Benchmark {
     _timeit.run(std::get<I>(args_tuple)...);
   }
 
+  template <detail::TupleLike T>
+  auto make_indices_for_tuple(T) {
+    return std::make_index_sequence<std::tuple_size_v<T>>{};
+  }
+
  public:
   Benchmark(const char* name,
-      const JobT& job,
-      TimerT,
       const TargetT& target,
+      const JobT& job,
+      TimerT timer,
       std::size_t nrepeats = 1,
       std::size_t nwarmups = 0)
       : name(name)
       , _job(job)
-      , _timeit(target, nrepeats, nwarmups) {}
+      , _timeit(target, timer, nrepeats, nwarmups) {}
 
   std::vector<double>& results() const {
     return _timeit.measurements();
