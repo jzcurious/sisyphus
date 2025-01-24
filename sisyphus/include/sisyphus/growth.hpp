@@ -1,5 +1,5 @@
-#ifndef _GROWTH_HPP_
-#define _GROWTH_HPP_
+#ifndef _SISYPHUS_GROWTH_HPP_
+#define _SISYPHUS_GROWTH_HPP_
 
 #include <concepts>
 #include <cstddef>
@@ -13,4 +13,4 @@ concept GrowhtFuncKind = requires(T x, std::size_t i) {
 
 }  // namespace sis
 
-#endif  // _GROWTH_HPP_
+#endif  // _SISYPHUS_GROWTH_HPP_
