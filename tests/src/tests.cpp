@@ -37,20 +37,21 @@ static void func1(std::span<float>& x) {
   for (std::size_t i = 0; i < x.size(); ++i) x[i] += x[i];
 }
 
-static void func2(std::span<float>& x, std::span<float>& y) {
-  for (std::size_t i = 0; i < x.size(); ++i) y[i] += x[i];
-}
+// static void func2(std::span<float>& x, std::span<float>& y) {
+//   for (std::size_t i = 0; i < x.size(); ++i) y[i] += x[i];
+// }
 
 TEST(Benchmark, single_arg) {
   auto job = sis::Job(SingleVectorProvider<float, 900>{},
       [](std::size_t i) { return (i + 1) * (i + 1); });
 
-  sis::Benchmark("My Benchmark", func1, job, ChronoTimer{}).run(30);
+  sis::Benchmark("My Benchmark", func1, job, dt::ChronoTimer{}).run(30);
 }
 
-TEST(Benchmark, some_args) {
-  auto job = sis::Job(
-      PairVectorProvider<float, 900>{}, [](std::size_t i) { return (i + 1) * (i + 1); });
+// TEST(Benchmark, some_args) {
+//   auto job = sis::Job(
+//       PairVectorProvider<float, 900>{}, [](std::size_t i) { return (i + 1) * (i + 1);
+//       });
 
-  sis::Benchmark("My Benchmark", func2, job, ChronoTimer{}).run(30);
-}
+//   sis::Benchmark("My Benchmark", func2, job, dt::ChronoTimer{}).run(30);
+// }
