@@ -38,16 +38,16 @@ class Benchmark {
   IterCallbackT _iter_callback;
 
  public:
-  template <class TargetT_, IterCallbackKind IterCallbackT_>
+  template <class TargetT_, JobKind JobT_, IterCallbackKind IterCallbackT_>
   Benchmark(const char* name,
       TargetT_&& target,
-      const JobT& job,
+      JobT_&& job,
       const TimerT& timer,
       std::size_t nrepeats,
       std::size_t nwarmups,
       IterCallbackT_&& iter_callback)
       : name(name)
-      , _job(job)
+      , _job(std::forward<JobT_>(job))
       , _timeit(std::forward<TargetT_>(target), timer, nrepeats, nwarmups)
       , _iter_callback(std::forward<IterCallbackT_>(iter_callback)) {}
 
@@ -73,18 +73,18 @@ class Benchmark {
 // clang-format off
 template <
   class TargetT_,
+  JobKind JobT_,
   IterCallbackKind IterCallbackT_,
-  JobKind JobT,
   dt::TimerKind TimerT
 >
 // clang-format on
 Benchmark(const char* name,
     TargetT_&& target,
-    const JobT& job,
+    JobT_&& job,
     const TimerT& timer,
     std::size_t nrepeats,
     std::size_t nwarmups,
-    IterCallbackT_&& iter_callback) -> Benchmark<TargetT_, JobT, TimerT, IterCallbackT_>;
+    IterCallbackT_&& iter_callback) -> Benchmark<TargetT_, JobT_, TimerT, IterCallbackT_>;
 
 }  // namespace sis
 
