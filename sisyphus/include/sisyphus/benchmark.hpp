@@ -7,19 +7,27 @@
 #include "deltat/timers/ktimer.hpp"
 
 namespace sis::detail {
-// void default_iter_callback() {}
+
+struct NoIterCallback {};
+
 }  // namespace sis::detail
 
 namespace sis {
 
-// TODO: iteration callback
+template <class T>
+concept IterCallbackKind
+    = std::is_same_v<T, detail::NoIterCallback> or requires(T x, std::size_t i) {
+        { x(i) };
+      };
 
-// template <class T, class... Us>
-// concept IterCallbackKind = requires(T x, Us... ys) {
-//   { x(ys...) };
-// };
-
-template <class TargetT, JobKind JobT, dt::TimerKind TimerT>
+// clang-format off
+template <
+  class TargetT,
+  JobKind JobT,
+  dt::TimerKind TimerT,
+  IterCallbackKind IterCallbackT
+>
+// clang-format on
 class Benchmark {
  public:
   const char* name;
@@ -27,18 +35,21 @@ class Benchmark {
  private:
   JobT _job;
   dt::TimeIt<TargetT, TimerT> _timeit;
+  IterCallbackT _iter_callback;
 
  public:
-  template <class TargetT_>
+  template <class TargetT_, IterCallbackKind IterCallbackT_>
   Benchmark(const char* name,
       TargetT_&& target,
       const JobT& job,
-      TimerT timer,
-      std::size_t nrepeats = 3,
-      std::size_t nwarmups = 1)
+      const TimerT& timer,
+      std::size_t nrepeats,
+      std::size_t nwarmups,
+      IterCallbackT_&& iter_callback)
       : name(name)
       , _job(job)
-      , _timeit(std::forward<TargetT_>(target), timer, nrepeats, nwarmups) {}
+      , _timeit(std::forward<TargetT_>(target), timer, nrepeats, nwarmups)
+      , _iter_callback(std::forward<IterCallbackT_>(iter_callback)) {}
 
   const dt::TimeIt<TargetT, TimerT>& timeit() const {
     return _timeit;
@@ -49,21 +60,31 @@ class Benchmark {
   }
 
   Benchmark& run(size_t nprobes) {
-    for (size_t i = 0; i < nprobes; ++i) {
+    for (std::size_t i = 0; i < nprobes; ++i) {
       auto args = _job(i);
-      _timeit.run(args);
+      _timeit.run(args);  // TODO: think about it
+      if constexpr (not std::is_same_v<detail::NoIterCallback, IterCallbackT>)
+        _iter_callback(i);
     }
     return *this;
   }
 };
 
-template <class TargetT_, JobKind JobT, dt::TimerKind TimerT>
+// clang-format off
+template <
+  class TargetT_,
+  IterCallbackKind IterCallbackT_,
+  JobKind JobT,
+  dt::TimerKind TimerT
+>
+// clang-format on
 Benchmark(const char* name,
     TargetT_&& target,
     const JobT& job,
-    TimerT timer,
-    std::size_t nrepeats = 3,
-    std::size_t nwarmups = 1) -> Benchmark<TargetT_, JobT, TimerT>;
+    const TimerT& timer,
+    std::size_t nrepeats,
+    std::size_t nwarmups,
+    IterCallbackT_&& iter_callback) -> Benchmark<TargetT_, JobT, TimerT, IterCallbackT_>;
 
 }  // namespace sis
 
