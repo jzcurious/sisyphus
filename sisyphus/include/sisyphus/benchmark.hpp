@@ -39,8 +39,8 @@ class Benchmark {
 
   Benchmark& run(size_t nprobes) {
     for (std::size_t i = 0; i < nprobes; ++i) {
-      auto args = _config.job(i);
-      _timeit.run(args);  // TODO: think about it
+      auto&& args = _config.job(i);
+      _timeit.run(args);
       if constexpr (_use_callback) _config.iter_callback(i);
     }
     return *this;
