@@ -1,5 +1,5 @@
-#ifndef _SISYPHUS_PROVIDER_
-#define _SISYPHUS_PROVIDER_
+#ifndef _SISYPHUS_PROVIDER_HPP_
+#define _SISYPHUS_PROVIDER_HPP_
 
 #include <concepts>
 #include <cstddef>
@@ -20,4 +20,4 @@ concept DataProviderKind = requires(T x, std::size_t n) {
 
 }  // namespace sis
 
-#endif  //   _SISYPHUS_PROVIDER_
+#endif  //   _SISYPHUS_PROVIDER_HPP_

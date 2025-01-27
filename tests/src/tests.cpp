@@ -45,19 +45,17 @@ TEST(Benchmark, single_arg) {
   auto job = sis::Job(SingleVectorProvider<float, 900>{},
       [](std::size_t i) { return (i + 1) * (i + 1); });
 
-  sis::Benchmark(
-      "My Benchmark", func1, job, dt::ChronoTimer{}, 2, 1, sis::detail::NoIterCallback{})
+  std::size_t counter = 0;
+
+  auto conf
+      = sis::BenchmarkConfig(job, dt::ChronoTimer{}, [&](std::size_t i) { counter++; });
+
+  sis::Benchmark("My Benchmark 1", func1, conf).run(30);
+
+  sis::Benchmark("My Benchmark 2",
+      func1,
+      sis::BenchmarkConfig(job, dt::ChronoTimer{}, [&](std::size_t i) { counter--; }))
       .run(30);
 
-  sis::Benchmark("My Benchmark", func1, job, dt::ChronoTimer{}, 2, 1, [](std::size_t i) {
-    std::cout << i << std::endl;
-  }).run(30);
+  EXPECT_EQ(counter, 0);
 }
-
-// TEST(Benchmark, some_args) {
-//   auto job = sis::Job(
-//       PairVectorProvider<float, 900>{}, [](std::size_t i) { return (i + 1) * (i + 1);
-//       });
-
-//   sis::Benchmark("My Benchmark", func2, job, dt::ChronoTimer{}).run(30);
-// }
