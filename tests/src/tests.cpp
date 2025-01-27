@@ -37,10 +37,6 @@ static void func1(std::span<float>& x) {
   for (std::size_t i = 0; i < x.size(); ++i) x[i] += x[i];
 }
 
-// static void func2(std::span<float>& x, std::span<float>& y) {
-//   for (std::size_t i = 0; i < x.size(); ++i) y[i] += x[i];
-// }
-
 TEST(Benchmark, single_arg) {
   auto job = sis::Job(SingleVectorProvider<float, 900>{},
       [](std::size_t i) { return (i + 1) * (i + 1); });
@@ -54,6 +50,29 @@ TEST(Benchmark, single_arg) {
 
   sis::Benchmark("My Benchmark 2",
       func1,
+      sis::BenchmarkConfig(job, dt::ChronoTimer{}, [&](std::size_t i) { counter--; }))
+      .run(30);
+
+  EXPECT_EQ(counter, 0);
+}
+
+TEST(Benchmark, two_args) {
+  auto job = sis::Job(
+      PairVectorProvider<float, 900>{}, [](std::size_t i) { return (i + 1) * (i + 1); });
+
+  std::size_t counter = 0;
+
+  auto conf
+      = sis::BenchmarkConfig(job, dt::ChronoTimer{}, [&](std::size_t i) { counter++; });
+
+  auto func2 = [](std::span<float>& x, std::span<float>& y) {
+    for (std::size_t i = 0; i < x.size(); ++i) y[i] += x[i];
+  };
+
+  sis::Benchmark("My Benchmark 1", func2, conf).run(30);
+
+  sis::Benchmark("My Benchmark 2",
+      func2,
       sis::BenchmarkConfig(job, dt::ChronoTimer{}, [&](std::size_t i) { counter--; }))
       .run(30);
 
